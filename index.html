@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boom Bap Tags: Underground Graffiti</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers:wght@400;700&family=Orbitron:wght@400;700;900&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+        }
+
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        #top-ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(139, 69, 19, 0.1));
+            color: #e5e5e5;
+            padding: 15px;
+            border-radius: 8px;
+            border: 3px solid #8B4513;
+            box-shadow:
+                0 0 30px rgba(139, 69, 19, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            max-width: 250px;
+            font-size: 12px;
+            line-height: 1.5;
+            backdrop-filter: blur(10px);
+        }
+
+        #title {
+            margin-bottom: 15px;
+            font-family: 'Bangers', cursive;
+            font-size: 20px;
+            font-weight: 700;
+            color: #CD853F;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow:
+                2px 2px 4px rgba(0, 0, 0, 0.8),
+                0 0 10px rgba(205, 133, 63, 0.5);
+            border-bottom: 2px solid #8B4513;
+            padding-bottom: 8px;
+            text-align: center;
+        }
+
+        #controls {
+            font-size: 10px;
+            border-left: 3px solid #8B4513;
+            padding-left: 8px;
+        }
+
+        #controls strong {
+            color: #CD853F;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #bottom-inventory {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.9), rgba(139, 69, 19, 0.2));
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 3px solid #8B4513;
+            box-shadow:
+                0 0 30px rgba(139, 69, 19, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .inventory-slot {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #4a4a4a;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .inventory-slot:hover {
+            border-color: #8B4513;
+            box-shadow: 0 0 10px rgba(139, 69, 19, 0.5);
+        }
+
+        .inventory-slot.active {
+            border-color: #CD853F;
+            box-shadow: 0 0 15px rgba(205, 133, 63, 0.7);
+        }
+
+        #color-picker {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            box-shadow: none;
+        }
+
+        .cap-label {
+            position: absolute;
+            bottom: -20px;
+            font-size: 8px;
+            color: #e5e5e5;
+            text-align: center;
+            width: 100%;
+            font-family: 'Orbitron', monospace;
+        }
+
+        #notification {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #CD853F;
+            padding: 5px 15px;
+            border-radius: 6px;
+            border: 1px solid #8B4513;
+            font-size: 12px;
+            font-family: 'Bangers', cursive;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        #notification.show {
+            opacity: 1;
+        }
+
+        #audio-notice {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #CD853F;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #8B4513;
+            font-size: 14px;
+            font-family: 'Bangers', cursive;
+            text-align: center;
+            z-index: 200;
+            display: none;
+        }
+
+        #audio-notice.show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+      <div id="container">
+        <div id="top-ui">
+            <div id="title">Underground Tags</div>
+            <div id="controls">
+                <strong>Spray the net:</strong><br />
+                WASD - Stroll<br />
+                LMB Hold - Scope<br />
+                RMB/Hold - Tag<br />
+                This is an Early Access<br />
+                version of the game <br />
+            </div>
+        </div>
+        <div id="bottom-inventory">
+            <div style="font-size: 10px; color: #CD853F; margin-right: 10px; white-space: nowrap;">Hue:</div>
+            <div class="inventory-slot">
+                <input type="color" id="color-picker" value="#ff0000">
+            </div>
+            <div style="font-size: 10px; color: #CD853F; margin-right: 10px; white-space: nowrap;">Nozzle:</div>
+            <div class="inventory-slot active" data-radius="5" data-name="Super Skinny" title="Super Skinny">
+                <div
+                    style="width: 20px; height: 20px; background: linear-gradient(45deg, #fff, #ccc); border-radius: 50%;">
+                </div>
+                <div class="cap-label">SS</div>
+            </div>
+            <div class="inventory-slot" data-radius="15" data-name="Outline" title="Outline">
+                <div
+                    style="width: 20px; height: 20px; background: linear-gradient(45deg, #fff, #ccc); border-radius: 50%;">
+                </div>
+                <div class="cap-label">O</div>
+            </div>
+            <div class="inventory-slot" data-radius="20" data-name="Script" title="Script">
+                <div
+                    style="width: 20px; height: 20px; background: linear-gradient(45deg, #fff, #ccc); border-radius: 50%;">
+                </div>
+                <div class="cap-label">S</div>
+            </div>
+            <div class="inventory-slot" data-radius="25" data-name="Skinny" title="Skinny">
+                <div
+                    style="width: 20px; height: 20px; background: linear-gradient(45deg, #fff, #ccc); border-radius: 50%;">
+                </div>
+                <div class="cap-label">SK</div>
+            </div>
+            <div class="inventory-slot" data-radius="30" data-name="Calligraphy" title="Calligraphy">
+                <div
+                    style="width: 20px; height: 20px; background: linear-gradient(45deg, #fff, #ccc); border-radius: 50%;">
+                </div>
+                <div class="cap-label">C</div>
+            </div>
+            <div class="inventory-slot" data-radius="40" data-name="Medium" title="Medium">
+                <div
+                    style="width: 20px; height: 20px; background: linear-gradient(45deg, #fff, #ccc); border-radius: 50%;">
+                </div>
+                <div class="cap-label">M</div>
+            </div>
+            <div class="inventory-slot" data-radius="50" data-name="Chisel" title="Chisel">
+                <div
+                    style="width: 20px; height: 20px; background: linear-gradient(45deg, #fff, #ccc); border-radius: 50%;">
+                </div>
+                <div class="cap-label">CH</div>
+            </div>
+            <div class="inventory-slot" data-radius="60" data-name="Fat Cap" title="Fat Cap">
+                <div
+                    style="width: 20px; height: 20px; background: linear-gradient(45deg, #fff, #ccc); border-radius: 50%;">
+                </div>
+                <div class="cap-label">F</div>
+            </div>
+            <div class="inventory-slot" data-radius="70" data-name="Super Fat" title="Super Fat">
+                <div
+                    style="width: 20px; height: 20px; background: linear-gradient(45deg, #fff, #ccc); border-radius: 50%;">
+                </div>
+                <div class="cap-label">SF</div>
+            </div>
+        </div>
+        <div id="notification"></div>
+        <div id="audio-notice">
+            <p>Click anywhere or press a key to start the vibe...</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        (function () {
+            const container = document.getElementById('container');
+            const rendererDomElement = document.createElement('canvas');
+            container.appendChild(rendererDomElement);
+
+            // Game state
+            const game = {
+                scene: null,
+                camera: null,
+                renderer: null,
+                walls: [],
+                mouse: new THREE.Vector2(),
+                raycaster: new THREE.Raycaster(),
+                isLeftMouseDown: false,
+                isRightMouseDown: false,
+                sprayColor: '#ff0000',
+                capRadius: 5,
+                isSprayCan: true,
+                moveForward: false,
+                moveBackward: false,
+                moveLeft: false,
+                moveRight: false,
+                euler: new THREE.Euler(0, 0, 0, 'YXZ'),
+                PI_2: Math.PI / 2,
+                prevTime: performance.now(),
+                velocity: new THREE.Vector3(0, 0, 0),
+                direction: new THREE.Vector3(),
+                isMoving: false,
+                particles: {
+                    geometry: null,
+                    material: null,
+                    mesh: null,
+                    positions: null,
+                    velocities: [],
+                    maxParticles: 50,
+                    particleCount: 0
+                },
+                audio: {
+                    background: new Audio('1.mp3'),
+                    spray: new Audio('spray.mp3'),
+                    spray2: new Audio('spray2.mp3'),
+                    steps: new Audio('steps.mp3')
+                },
+                randomTimer: 0,
+                stepTimer: 0,
+                notificationTimeout: null,
+                audioStarted: false
+            };
+
+            // Initialize velocities array
+            game.particles.velocities = [];
+
+            // Initialize audio
+            game.audio.background.loop = true;
+            game.audio.background.volume = 0.3;
+            game.audio.spray.loop = true;
+            game.audio.spray.volume = 0.5;
+            game.audio.spray2.volume = 0.4;
+            game.audio.steps.loop = false;
+            game.audio.steps.volume = 0.6;
+
+            // Show audio notice initially
+            const audioNotice = document.getElementById('audio-notice');
+            audioNotice.classList.add('show');
+
+            // Setup
+            function init() {
+                // Scene
+                game.scene = new THREE.Scene();
+                game.scene.background = new THREE.Color(0x1a1a2e);
+                game.scene.fog = new THREE.Fog(0x1a1a2e, 1, 60);
+
+                // Camera
+                game.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                game.camera.position.set(0, 1.7, 5);
+
+                // Renderer
+                game.renderer = new THREE.WebGLRenderer({ canvas: rendererDomElement, antialias: true });
+                game.renderer.setSize(window.innerWidth, window.innerHeight);
+                game.renderer.shadowMap.enabled = true;
+                game.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+                // Enhanced Lighting
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+                game.scene.add(ambientLight);
+
+                const hemiLight = new THREE.HemisphereLight(0x444444, 0x000000, 0.6);
+                game.scene.add(hemiLight);
+
+                const dirLight = new THREE.DirectionalLight(0xffa500, 0.7);
+                dirLight.position.set(10, 20, 10);
+                dirLight.castShadow = true;
+                dirLight.shadow.mapSize.width = 2048;
+                dirLight.shadow.mapSize.height = 2048;
+                dirLight.shadow.camera.far = 50;
+                game.scene.add(dirLight);
+
+                // Additional fill light
+                const fillLight = new THREE.DirectionalLight(0x8B4513, 0.3);
+                fillLight.position.set(-10, 10, -10);
+                game.scene.add(fillLight);
+
+                // Street lights - add more for better illumination
+                const createStreetLight = (x, z) => {
+                    const pole = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.1, 0.1, 5, 8),
+                        new THREE.MeshStandardMaterial({ color: 0x333333 })
+                    );
+                    pole.position.set(x, 2.5, z);
+                    game.scene.add(pole);
+
+                    const light = new THREE.PointLight(0xffaa00, 1.2, 20);
+                    light.position.set(x, 5, z);
+                    light.castShadow = true;
+                    game.scene.add(light);
+
+                    const bulb = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.2, 16, 16),
+                        new THREE.MeshBasicMaterial({ color: 0xffaa00 })
+                    );
+                    bulb.position.set(x, 5, z);
+                    game.scene.add(bulb);
+                };
+
+                createStreetLight(-8, 5);
+                createStreetLight(8, 5);
+                createStreetLight(-8, -5);
+                createStreetLight(8, -5);
+                createStreetLight(0, 10);
+                createStreetLight(-12, 0);
+                createStreetLight(12, 0);
+
+                // Ground
+                const groundGeo = new THREE.PlaneGeometry(100, 100);
+                const groundMat = new THREE.MeshStandardMaterial({
+                    color: 0x2a2a2a,
+                    roughness: 0.9,
+                    metalness: 0.1
+                });
+                const ground = new THREE.Mesh(groundGeo, groundMat);
+                ground.rotation.x = -Math.PI / 2;
+                ground.receiveShadow = true;
+                game.scene.add(ground);
+
+                // Create walls (visual only, no collision)
+                createWall(0, 2.5, -8, 0, 16, 5);
+                createWall(-8, 2.5, 0, Math.PI / 2, 16, 5);
+                createWall(8, 2.5, 0, -Math.PI / 2, 16, 5);
+                createWall(0, 2.5, 8, Math.PI, 16, 5);
+
+                // Buildings around the central spray area (barrier-like)
+                const createBuilding = (x, z, w, h, d) => {
+                    const buildingGeo = new THREE.BoxGeometry(w, h, d);
+                    const buildingMat = new THREE.MeshStandardMaterial({
+                        color: 0x444444,
+                        roughness: 0.8,
+                        metalness: 0.2
+                    });
+                    const building = new THREE.Mesh(buildingGeo, buildingMat);
+                    building.position.set(x, h / 2, z);
+                    building.castShadow = true;
+                    building.receiveShadow = true;
+                    game.scene.add(building);
+
+                    // Add windows on front face
+                    const windowGeo = new THREE.BoxGeometry(0.5, 0.7, 0.1);
+                    const windowMat = new THREE.MeshBasicMaterial({ color: 0xffff88 });
+                    for (let i = 1; i < h - 1; i += 2) {
+                        for (let j = -w / 2 + 1; j < w / 2; j += 2) {
+                            if (Math.random() > 0.3) {
+                                const windowMesh = new THREE.Mesh(windowGeo, windowMat);
+                                windowMesh.position.set(x + j, i, z + d / 2 + 0.05);
+                                game.scene.add(windowMesh);
+                            }
+                        }
+                    }
+                };
+
+                // Original distant buildings
+                createBuilding(-15, -15, 8, 12, 8);
+                createBuilding(15, -15, 6, 15, 6);
+                createBuilding(-15, 15, 10, 10, 10);
+                createBuilding(15, 15, 7, 18, 7);
+
+                // Barrier buildings around the spray area (closer, varied sizes)
+                // North side
+                createBuilding(-12, 12, 8, 10, 4);
+                createBuilding(0, 12, 6, 14, 4);
+                createBuilding(12, 12, 7, 9, 4);
+                // South side
+                createBuilding(-12, -12, 5, 11, 4);
+                createBuilding(0, -12, 9, 13, 4);
+                createBuilding(12, -12, 6, 8, 4);
+                // East side
+                createBuilding(12, 0, 4, 12, 8);
+                createBuilding(12, 6, 4, 15, 6);
+                createBuilding(12, -6, 4, 10, 7);
+                // West side
+                createBuilding(-12, 0, 4, 9, 8);
+                createBuilding(-12, 6, 4, 16, 5);
+                createBuilding(-12, -6, 4, 11, 6);
+
+                // Additional variants further out for density
+                createBuilding(-20, 0, 5, 8, 5);
+                createBuilding(20, 0, 6, 10, 6);
+                createBuilding(0, -20, 7, 12, 7);
+                createBuilding(0, 20, 8, 9, 8);
+                createBuilding(-25, -25, 4, 6, 4);
+                createBuilding(25, -25, 5, 7, 5);
+                createBuilding(-25, 25, 6, 11, 6);
+                createBuilding(25, 25, 4, 9, 4);
+                createBuilding(-10, -25, 5, 10, 5);
+                createBuilding(10, -25, 6, 8, 6);
+                createBuilding(-10, 25, 4, 12, 4);
+                createBuilding(10, 25, 7, 11, 7);
+
+                // Initialize particles
+                initParticles();
+
+                // UI Event Listeners
+                setupUI();
+
+                // Event listeners
+                setupEventListeners();
+
+                // Random spray2 timer
+                function playRandomSpray() {
+                    game.audio.spray2.play().catch(e => console.log('Sound play error'));
+                    game.randomTimer = Math.random() * 40000 + 10000;
+                    setTimeout(playRandomSpray, game.randomTimer);
+                }
+                game.randomTimer = Math.random() * 40000 + 10000;
+                setTimeout(playRandomSpray, game.randomTimer);
+
+                // Animate
+                animate();
+
+                // Resize
+                window.addEventListener('resize', onResize);
+            }
+
+            function createWall(x, y, z, rotY, width, height) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 2048;
+                canvas.height = 2048;
+                const ctx = canvas.getContext('2d');
+
+                // Detailed brick texture
+                const brickW = 100;
+                const brickH = 40;
+                const mortarSize = 3;
+
+                ctx.fillStyle = '#2a2a2a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw bricks with variation
+                for (let i = 0; i < canvas.height; i += brickH) {
+                    const offset = (Math.floor(i / brickH) % 2) * (brickW / 2);
+                    for (let j = -brickW; j < canvas.width; j += brickW) {
+                        const brickColor = `rgb(${120 + Math.random() * 30}, ${60 + Math.random() * 20}, ${40 + Math.random() * 20})`;
+                        ctx.fillStyle = brickColor;
+                        ctx.fillRect(j + offset + mortarSize, i + mortarSize, brickW - mortarSize * 2, brickH - mortarSize * 2);
+
+                        // Add texture to bricks
+                        ctx.fillStyle = `rgba(0, 0, 0, ${Math.random() * 0.2})`;
+                        for (let t = 0; t < 10; t++) {
+                            ctx.fillRect(
+                                j + offset + Math.random() * brickW,
+                                i + Math.random() * brickH,
+                                Math.random() * 5,
+                                Math.random() * 5
+                            );
+                        }
+                    }
+                }
+
+                // Add weathering and grime
+                ctx.fillStyle = 'rgba(20, 20, 20, 0.3)';
+                for (let w = 0; w < 50; w++) {
+                    ctx.beginPath();
+                    ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 30, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+
+                // Visual mesh (plane for texture)
+                const visualGeo = new THREE.PlaneGeometry(width, height);
+                const visualMat = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.8, metalness: 0.1 });
+                const visualMesh = new THREE.Mesh(visualGeo, visualMat);
+                visualMesh.position.set(x, y, z);
+                visualMesh.rotation.y = rotY;
+                visualMesh.receiveShadow = true;
+                visualMesh.castShadow = true;
+                game.scene.add(visualMesh);
+
+                game.walls.push({
+                    visual: visualMesh,
+                    canvas,
+                    ctx,
+                    texture
+                });
+            }
+
+            function initParticles() {
+                const positions = new Float32Array(game.particles.maxParticles * 3);
+                game.particles.geometry = new THREE.BufferGeometry();
+                game.particles.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                game.particles.material = new THREE.PointsMaterial({ size: 0.05, transparent: true, opacity: 0.8 });
+                game.particles.mesh = new THREE.Points(game.particles.geometry, game.particles.material);
+                game.scene.add(game.particles.mesh);
+                game.particles.positions = positions;
+                game.particles.velocities = new Array(game.particles.maxParticles);
+            }
+
+            function updateParticles() {
+                if (!game.isRightMouseDown) return;
+
+                game.raycaster.setFromCamera(game.mouse, game.camera);
+                const direction = game.raycaster.ray.direction.clone();
+                const startPos = game.camera.position.clone().add(new THREE.Vector3(0, -0.5, 0));
+                startPos.add(direction.clone().multiplyScalar(0.5));
+
+                // Add 1-3 particles per frame
+                const numNew = Math.floor(Math.random() * 3) + 1;
+                for (let i = 0; i < numNew; i++) {
+                    if (game.particles.particleCount < game.particles.maxParticles) {
+                        const idx = game.particles.particleCount * 3;
+                        game.particles.positions[idx] = startPos.x + (Math.random() - 0.5) * 0.1;
+                        game.particles.positions[idx + 1] = startPos.y + (Math.random() - 0.5) * 0.1;
+                        game.particles.positions[idx + 2] = startPos.z + (Math.random() - 0.5) * 0.1;
+
+                        // Velocity towards direction
+                        const vel = direction.clone().multiplyScalar(5 + Math.random() * 10);
+                        game.particles.velocities[game.particles.particleCount] = vel;
+                        game.particles.particleCount++;
+                    }
+                }
+
+                // Update existing particles
+                for (let i = 0; i < game.particles.particleCount; i++) {
+                    const idx = i * 3;
+                    const vel = game.particles.velocities[i];
+                    game.particles.positions[idx] += vel.x * 0.016;
+                    game.particles.positions[idx + 1] += vel.y * 0.016;
+                    game.particles.positions[idx + 2] += vel.z * 0.016;
+
+                    // Fade out
+                    vel.multiplyScalar(0.98);
+                    if (vel.length() < 0.1) {
+                        // Remove particle
+                        game.particles.positions[idx] = 0;
+                        game.particles.positions[idx + 1] = 0;
+                        game.particles.positions[idx + 2] = 0;
+                        game.particles.particleCount--;
+                        if (i < game.particles.particleCount) {
+                            // Swap with last
+                            const lastIdx = game.particles.particleCount * 3;
+                            game.particles.positions[idx] = game.particles.positions[lastIdx];
+                            game.particles.positions[idx + 1] = game.particles.positions[lastIdx + 1];
+                            game.particles.positions[idx + 2] = game.particles.positions[lastIdx + 2];
+                            game.particles.velocities[i] = game.particles.velocities[game.particles.particleCount];
+                        }
+                        i--;
+                    }
+                }
+
+                game.particles.geometry.attributes.position.needsUpdate = true;
+                game.particles.material.color.setHex(parseInt(game.sprayColor.slice(1), 16));
+            }
+
+            function showNotification(name) {
+                const notification = document.getElementById('notification');
+                notification.textContent = name;
+                notification.classList.add('show');
+                if (game.notificationTimeout) {
+                    clearTimeout(game.notificationTimeout);
+                }
+                game.notificationTimeout = setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
+            }
+
+            function setupUI() {
+                const colorPicker = document.getElementById('color-picker');
+                colorPicker.addEventListener('change', (e) => {
+                    game.sprayColor = e.target.value;
+                });
+
+                const capSlots = document.querySelectorAll('.inventory-slot[data-radius]');
+                capSlots.forEach((slot, index) => {
+                    slot.addEventListener('click', (e) => {
+                        const radius = parseInt(e.currentTarget.dataset.radius);
+                        const name = e.currentTarget.dataset.name;
+                        game.capRadius = radius;
+                        capSlots.forEach(s => s.classList.remove('active'));
+                        e.currentTarget.classList.add('active');
+                        showNotification(name);
+                    });
+                });
+            }
+
+            function setupEventListeners() {
+                // Function to start audio on interaction
+                function startAudio() {
+                    if (!game.audioStarted) {
+                        game.audio.background.play().catch(e => console.log('Audio start error:', e));
+                        game.audioStarted = true;
+                        audioNotice.classList.remove('show');
+                    }
+                }
+
+                const onMouseMove = (e) => {
+                    if (game.isLeftMouseDown) {
+                        const movementX = e.movementX || 0;
+                        const movementY = e.movementY || 0;
+
+                        game.euler.setFromQuaternion(game.camera.quaternion);
+                        game.euler.y -= movementX * 0.002;
+                        game.euler.x -= movementY * 0.002;
+                        game.euler.x = Math.max(-game.PI_2, Math.min(game.PI_2, game.euler.x));
+                        game.camera.quaternion.setFromEuler(game.euler);
+                    }
+
+                    const rect = game.renderer.domElement.getBoundingClientRect();
+                    game.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                    game.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+                    if (game.isRightMouseDown && game.isSprayCan) {
+                        sprayPaint();
+                    }
+                };
+
+                const onMouseDown = (e) => {
+                    startAudio(); // Start audio on first interaction
+                    if (e.button === 0) { // Left mouse - look
+                        game.isLeftMouseDown = true;
+                        e.preventDefault();
+                    } else if (e.button === 2) { // Right mouse - spray
+                        game.isRightMouseDown = true;
+                        game.audio.spray.play().catch(e => console.log('Sound play error'));
+                        if (game.isSprayCan) sprayPaint();
+                        e.preventDefault();
+                    }
+                };
+
+                const onMouseUp = (e) => {
+                    if (e.button === 0) {
+                        game.isLeftMouseDown = false;
+                    } else if (e.button === 2) {
+                        game.isRightMouseDown = false;
+                        game.audio.spray.pause();
+                        game.audio.spray.currentTime = 0;
+                    }
+                };
+
+                const onContextMenu = (e) => {
+                    e.preventDefault();
+                };
+
+                game.renderer.domElement.addEventListener('mousemove', onMouseMove);
+                game.renderer.domElement.addEventListener('mousedown', onMouseDown);
+                game.renderer.domElement.addEventListener('mouseup', onMouseUp);
+                game.renderer.domElement.addEventListener('contextmenu', onContextMenu);
+
+                // Click on notice to start audio
+                audioNotice.addEventListener('click', startAudio);
+
+                const onKeyDown = (e) => {
+                    startAudio(); // Start audio on first key press
+                    switch (e.key.toLowerCase()) {
+                        case 'w': game.moveForward = true; break;
+                        case 's': game.moveBackward = true; break;
+                        case 'a': game.moveLeft = true; break;
+                        case 'd': game.moveRight = true; break;
+                        case 'i':
+                            e.preventDefault();
+                            takeScreenshot();
+                            break;
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                        case '9':
+                            e.preventDefault();
+                            const index = parseInt(e.key) - 1;
+                            const capSlots = document.querySelectorAll('.inventory-slot[data-radius]');
+                            if (index < capSlots.length) {
+                                const slot = capSlots[index];
+                                const radius = parseInt(slot.dataset.radius);
+                                const name = slot.dataset.name;
+                                game.capRadius = radius;
+                                capSlots.forEach(s => s.classList.remove('active'));
+                                slot.classList.add('active');
+                                showNotification(name);
+                            }
+                            break;
+                    }
+                };
+
+                const onKeyUp = (e) => {
+                    switch (e.key.toLowerCase()) {
+                        case 'w': game.moveForward = false; break;
+                        case 's': game.moveBackward = false; break;
+                        case 'a': game.moveLeft = false; break;
+                        case 'd': game.moveRight = false; break;
+                    }
+                };
+
+                window.addEventListener('keydown', onKeyDown);
+                window.addEventListener('keyup', onKeyUp);
+            }
+
+            function takeScreenshot() {
+                html2canvas(document.body).then(canvas => {
+                    const dataURL = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.download = 'graffiti-screenshot.png';
+                    link.href = dataURL;
+                    link.click();
+                }).catch(e => {
+                    console.log('Screenshot error:', e);
+                    // Fallback to canvas only
+                    const dataURL = game.renderer.domElement.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.download = 'graffiti-screenshot.png';
+                    link.href = dataURL;
+                    link.click();
+                });
+            }
+
+            function sprayPaint() {
+                game.raycaster.setFromCamera(game.mouse, game.camera);
+
+                for (const wall of game.walls) {
+                    const intersects = game.raycaster.intersectObject(wall.visual);
+
+                    if (intersects.length > 0 && intersects[0].distance < 15) {
+                        const uv = intersects[0].uv;
+                        const x = uv.x * wall.canvas.width;
+                        const y = (1 - uv.y) * wall.canvas.height;
+
+                        const radius = game.capRadius;
+                        const size = radius * 2;
+
+                        // Realistic spray effect
+                        const gradient = wall.ctx.createRadialGradient(x, y, 0, x, y, radius);
+                        gradient.addColorStop(0, game.sprayColor + 'CC');
+                        gradient.addColorStop(0.3, game.sprayColor + '80');
+                        gradient.addColorStop(0.7, game.sprayColor + '30');
+                        gradient.addColorStop(1, game.sprayColor + '00');
+
+                        wall.ctx.fillStyle = gradient;
+                        wall.ctx.fillRect(x - radius, y - radius, size, size);
+
+                        // Add spray drips randomly
+                        if (Math.random() > 0.95) {
+                            wall.ctx.fillStyle = game.sprayColor + '80';
+                            wall.ctx.fillRect(x - 2, y, 4, Math.random() * 30);
+                        }
+
+                        wall.texture.needsUpdate = true;
+                        break;
+                    }
+                }
+            }
+
+            function updateAudio() {
+                const isMovingNow = game.moveForward || game.moveBackward || game.moveLeft || game.moveRight;
+                if (isMovingNow && !game.isMoving) {
+                    game.audio.steps.currentTime = 0;
+                    game.audio.steps.play().catch(e => console.log('Sound play error'));
+                    game.isMoving = true;
+                    game.stepTimer = 0;
+                } else if (!isMovingNow && game.isMoving) {
+                    game.audio.steps.pause();
+                    game.isMoving = false;
+                } else if (isMovingNow && game.isMoving) {
+                    game.stepTimer += 0.016;
+                    if (game.stepTimer > 0.5) { // Repeat every 0.5s
+                        game.audio.steps.currentTime = 0;
+                        game.audio.steps.play().catch(e => console.log('Sound play error'));
+                        game.stepTimer = 0;
+                    }
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                const time = performance.now();
+                const delta = (time - game.prevTime) / 1000;
+
+                // Slower walking speed
+                const speed = 100.0;
+
+                // Friction
+                game.velocity.x -= game.velocity.x * 10.0 * delta;
+                game.velocity.z -= game.velocity.z * 10.0 * delta;
+
+                // Gravity
+                game.velocity.y -= 9.8 * 10 * delta;
+                game.camera.position.y += game.velocity.y * delta;
+                if (game.camera.position.y < 1.7) {
+                    game.velocity.y = 0;
+                    game.camera.position.y = 1.7;
+                }
+
+                // Movement direction
+                game.direction.z = Number(game.moveForward) - Number(game.moveBackward);
+                game.direction.x = Number(game.moveRight) - Number(game.moveLeft);
+                game.direction.normalize();
+
+                if (game.moveForward || game.moveBackward) game.velocity.z -= game.direction.z * speed * delta;
+                if (game.moveLeft || game.moveRight) game.velocity.x += game.direction.x * speed * delta;
+
+                const moveVector = new THREE.Vector3();
+                moveVector.set(game.velocity.x * delta, 0, game.velocity.z * delta);
+                moveVector.applyEuler(game.euler);
+
+                // No collision detection - free movement
+                game.camera.position.add(moveVector);
+
+                updateParticles();
+                updateAudio();
+
+                game.prevTime = time;
+                game.renderer.render(game.scene, game.camera);
+            }
+
+            function onResize() {
+                game.camera.aspect = window.innerWidth / window.innerHeight;
+                game.camera.updateProjectionMatrix();
+                game.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            // Cleanup on unload
+            window.addEventListener('beforeunload', () => {
+                window.removeEventListener('resize', onResize);
+            });
+
+            // Start
+            init();
+        })();
+    </script>
+</body>
+
+</html>
